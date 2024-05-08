@@ -1648,7 +1648,8 @@ namespace xr
                     ArCloudAnchorState cloud_anchor_state;
                     ArResolveCloudAnchorFuture_getResultCloudAnchorState(m_impl->XrContext->Session,
                                                                            *ar_future, &cloud_anchor_state);
-                    LOGD("GTAP cloud anchor state:%d", cloud_anchor_state);
+                    LOGD("GTAP future bef cloud anchor state!\n");
+                    LOGD("GTAP cloud anchor state: %d\n", cloud_anchor_state);
                     if (cloud_anchor_state == AR_CLOUD_ANCHOR_STATE_SUCCESS) {
                         ArResolveCloudAnchorFuture_acquireResultAnchor(m_impl->XrContext->Session,
                                                                        *ar_future, &earth_anchor);
@@ -2083,7 +2084,8 @@ namespace xr
                         ArCloudAnchorState cloud_anchor_state;
                         ArResolveCloudAnchorFuture_getResultCloudAnchorState(m_impl->XrContext->Session,
                                                                            *ar_future, &cloud_anchor_state);
-                        LOGD("GTAP cloud anchor state:%d", cloud_anchor_state);
+                        LOGD("GTAP future bef cloud anchor state!\n");
+                        LOGD("GTAP cloud anchor state: %d\n", cloud_anchor_state);
                         if (cloud_anchor_state == AR_CLOUD_ANCHOR_STATE_SUCCESS) {
                             ArResolveCloudAnchorFuture_acquireResultAnchor(m_impl->XrContext->Session,
                                                                            *ar_future, &earth_anchor);
