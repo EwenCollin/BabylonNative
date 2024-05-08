@@ -401,6 +401,23 @@ namespace xr
         uintptr_t GetNativeXrContext();
         std::string GetNativeXrContextType();
 
+        //add get earthQuaternion + lat,lon
+        void addLocalEarthAnchor(std::string anchor_name, float *in_quaternion4_translation3, bool *out_placed, float *out_quaternion_4, double *out_altitude, double *out_latitude, double *out_longitude);
+        void removeEarthAnchor(std::string anchor_name);
+        void getEarthAnchorPose(std::string anchor_name, float *out_matrix, float *out_cam_matrix);
+        void hitTestEarthAnchor(std::string anchor_name, float in_tap_x, float in_tap_y, bool *out_placed, float *out_quaternion_4, double *out_altitude, double *out_latitude, double *out_longitude);
+        void addEarthAnchor(std::string anchor_name, float *in_quaternion_4, double in_latitude, double in_longitude, double in_altitude, bool *out_placed);
+        void getEarthQuaternionLatitudeLongitude(float *out_quaternion_4, double *out_latitude, double *out_longitude, double *out_altitude, double *out_horizontal_accuracy, double *out_orientation_yaw_accuracy_degrees, double *out_vertical_accuracy, bool *out_success);
+        void addTerrainAnchor(std::string anchor_name, float *in_quaternion_4, double in_latitude, double in_longitude, double in_altitude, bool *out_placed);
+        void getTerrainAnchorPose(std::string anchor_name, float *out_matrix, bool *out_tracked);
+        void hitTestAnchor(std::string anchor_name, float in_tap_x, float in_tap_y, bool *out_placed);
+        void estimateFeatureMapQualityForHosting(std::string anchor_name, bool *is_good);
+        void hostCloudAnchor(std::string anchor_name, int in_ttl_days, bool *out_error);
+        void resolveCloudAnchor(std::string anchor_name, std::string cloud_anchor_id, bool *out_error);
+        void getCloudAnchorHostStatus(std::string anchor_name, std::string *out_cloud_anchor_id, bool *out_hosted, bool *out_error);
+        void getEarthAnchorGeospatialPose(std::string anchor_name, float *out_eus_quaternion4, double *out_latitude, double *out_longitude, double *out_altitude, bool *out_success, double *out_horizontal_accuracy, double *out_orientation_yaw_accuracy_degrees, double *out_vertical_accuracy);
+
+
     private:
         struct Impl;
         std::unique_ptr<Impl> m_impl{};
