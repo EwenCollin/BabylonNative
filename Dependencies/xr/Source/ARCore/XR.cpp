@@ -2062,6 +2062,40 @@ namespace xr
                     ArFuture_release(reinterpret_cast<ArFuture*>(*ar_future));
                     m_impl->XrContext->Futures.erase(anchor_name);
                 }
+            } else {
+            std::shared_ptr<ArResolveCloudAnchorFuture*> ar_future;
+            auto jt2 = m_impl->XrContext->CloudAnchorResolvingFutures.find(anchor_name);
+            if (jt2 != m_impl->XrContext->CloudAnchorResolvingFutures.end()) {
+                LOGD("Cloud resolving future!\n");
+                ar_future = jt2->second;
+                ArFutureState ar_future_state;
+                LOGD("GTAP future bef get state!\n");
+                ArFuture_getState(m_impl->XrContext->Session, reinterpret_cast<ArFuture*>(*ar_future), &ar_future_state);
+                LOGD("GTAP future af get state!\n");
+                if (ar_future_state == AR_FUTURE_STATE_DONE) {
+                    ArAnchor* earth_anchor = NULL;
+                    LOGD("GTAP future bef acq result anchor!\n");
+                    ArResolveCloudAnchorFuture_acquireResultAnchor(m_impl->XrContext->Session,
+                                                                       *ar_future, &earth_anchor);
+
+                    LOGD("GTAP future af acq result anchor!\n");
+                    auto earth_anchor_ptr = std::make_shared<ArAnchor*>(earth_anchor);
+                    m_impl->XrContext->EarthAnchors.emplace(anchor_name, std::move(earth_anchor_ptr));
+                    LOGD("GTAP future af emplace!\n");
+                    ArTrackingState tracking_state;
+                    LOGD("GTAP future bef get tracking state!\n");
+                    ArAnchor_getTrackingState(m_impl->XrContext->Session, earth_anchor, &tracking_state);
+                    LOGD("GTAP future af get tracking state!\n");
+                    if (tracking_state == AR_TRACKING_STATE_TRACKING) {
+                        LOGD("GTAP future af get tracking state, State is tracking!\n");
+                        ArPose *out_pose = NULL;
+                        ArPose_create(m_impl->XrContext->Session, NULL, &out_pose);
+                        ArAnchor_getPose(m_impl->XrContext->Session, earth_anchor, out_pose);
+                        ArPose_getMatrix(m_impl->XrContext->Session, out_pose, out_matrix);
+                    }
+                    ArFuture_release(reinterpret_cast<ArFuture*>(*ar_future));
+                    m_impl->XrContext->CloudAnchorResolvingFutures.erase(anchor_name);
+                }
             }
         }
     }
