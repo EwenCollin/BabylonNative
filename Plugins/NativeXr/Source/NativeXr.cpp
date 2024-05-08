@@ -3691,6 +3691,7 @@ namespace Babylon
                 auto latitude = info[5].As<Napi::Number>().DoubleValue();
                 auto longitude = info[6].As<Napi::Number>().DoubleValue();
                 auto altitude = info[7].As<Napi::Number>().DoubleValue();
+                bool out_placed = false;
                 float in_quaternion_4[4] = {qx, qy, qz, qw};
                 m_xr->addTerrainAnchor(anchor_name, in_quaternion_4, latitude, longitude, altitude, &out_placed);
                 Napi::Object addAnchorResult = Napi::Object::New(info.Env());
