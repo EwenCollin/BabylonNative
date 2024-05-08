@@ -1645,6 +1645,7 @@ namespace xr
                 if (ar_future_state == AR_FUTURE_STATE_DONE) {
                     ArAnchor* earth_anchor = NULL;
                     LOGD("GTAP future bef acq result anchor!\n");
+                    ArCloudAnchorState cloud_anchor_state;
                     ArResolveCloudAnchorFuture_getResultCloudAnchorState(m_impl->XrContext->Session,
                                                                            *ar_future, &cloud_anchor_state);
                     LOGD("GTAP cloud anchor state:%d", cloud_anchor_state);
