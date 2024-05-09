@@ -1642,6 +1642,7 @@ namespace xr
                 LOGD("GTAP future bef get state!\n");
                 ArFuture_getState(m_impl->XrContext->Session, reinterpret_cast<ArFuture*>(*ar_future), &ar_future_state);
                 LOGD("GTAP future af get state!\n");
+                LOGD("GTAP future cloud state is %d\n", ar_future_state);
                 if (ar_future_state == AR_FUTURE_STATE_DONE) {
                     ArAnchor* earth_anchor = NULL;
                     LOGD("GTAP future bef acq result anchor!\n");
@@ -1877,7 +1878,7 @@ namespace xr
             if (out_feature_map_quality == AR_FEATURE_MAP_QUALITY_GOOD) {
                 LOGD("AFMQ good!\n");
             }
-            *is_good = out_feature_map_quality == AR_FEATURE_MAP_QUALITY_GOOD;
+            *is_good = out_feature_map_quality != AR_FEATURE_MAP_QUALITY_INSUFFICIENT;
         }
     }
 
@@ -2078,6 +2079,7 @@ namespace xr
                     LOGD("GTAP future bef get state!\n");
                     ArFuture_getState(m_impl->XrContext->Session, reinterpret_cast<ArFuture*>(*ar_future), &ar_future_state);
                     LOGD("GTAP future af get state!\n");
+                    LOGD("GTAP future cloud state is %d\n", ar_future_state);
                     if (ar_future_state == AR_FUTURE_STATE_DONE) {
                         ArAnchor* earth_anchor = NULL;
                         LOGD("GTAP future bef acq result anchor!\n");
