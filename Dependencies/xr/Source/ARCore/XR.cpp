@@ -1636,34 +1636,34 @@ namespace xr
             std::shared_ptr<ArResolveCloudAnchorFuture*> ar_future;
             auto jt2 = m_impl->XrContext->CloudAnchorResolvingFutures.find(anchor_name);
             if (jt2 != m_impl->XrContext->CloudAnchorResolvingFutures.end()) {
-                LOGD("Cloud resolving future!\n");
+                //LOGD("Cloud resolving future!\n");
                 ar_future = jt2->second;
                 ArFutureState ar_future_state;
-                LOGD("GTAP future bef get state!\n");
+                //LOGD("GTAP future bef get state!\n");
                 ArFuture_getState(m_impl->XrContext->Session, reinterpret_cast<ArFuture*>(*ar_future), &ar_future_state);
-                LOGD("GTAP future af get state!\n");
-                LOGD("GTAP future cloud state is %d\n", ar_future_state);
+                //LOGD("GTAP future af get state!\n");
+                //LOGD("GTAP future cloud state is %d\n", ar_future_state);
                 if (ar_future_state == AR_FUTURE_STATE_DONE) {
                     ArAnchor* earth_anchor = NULL;
-                    LOGD("GTAP future bef acq result anchor!\n");
+                    //LOGD("GTAP future bef acq result anchor!\n");
                     ArCloudAnchorState cloud_anchor_state;
                     ArResolveCloudAnchorFuture_getResultCloudAnchorState(m_impl->XrContext->Session,
                                                                            *ar_future, &cloud_anchor_state);
-                    LOGD("GTAP future bef cloud anchor state!\n");
-                    LOGD("GTAP cloud anchor state: %d\n", cloud_anchor_state);
+                    //LOGD("GTAP future bef cloud anchor state!\n");
+                    //LOGD("GTAP cloud anchor state: %d\n", cloud_anchor_state);
                     if (cloud_anchor_state == AR_CLOUD_ANCHOR_STATE_SUCCESS) {
                         ArResolveCloudAnchorFuture_acquireResultAnchor(m_impl->XrContext->Session,
                                                                        *ar_future, &earth_anchor);
-                        LOGD("GTAP future af acq result anchor!\n");
+                        //LOGD("GTAP future af acq result anchor!\n");
                         auto earth_anchor_ptr = std::make_shared<ArAnchor*>(earth_anchor);
-                        m_impl->XrContext->EarthAnchors.emplace(anchor_name, std::move(earth_anchor_ptr));
-                        LOGD("GTAP future af emplace!\n");
+                        m_impl->XrContext->EarthAnchors[anchor_name] = std::move(earth_anchor_ptr);
+                        //LOGD("GTAP future af emplace!\n");
                         ArTrackingState tracking_state;
-                        LOGD("GTAP future bef get tracking state!\n");
+                        //LOGD("GTAP future bef get tracking state!\n");
                         ArAnchor_getTrackingState(m_impl->XrContext->Session, earth_anchor, &tracking_state);
-                        LOGD("GTAP future af get tracking state!\n");
+                        //LOGD("GTAP future af get tracking state!\n");
                         if (tracking_state == AR_TRACKING_STATE_TRACKING) {
-                            LOGD("GTAP future af get tracking state, State is tracking!\n");
+                            //LOGD("GTAP future af get tracking state, State is tracking!\n");
                             ArPose *out_pose = NULL;
                             ArPose_create(m_impl->XrContext->Session, NULL, &out_pose);
                             ArAnchor_getPose(m_impl->XrContext->Session, earth_anchor, out_pose);
@@ -1681,23 +1681,23 @@ namespace xr
         std::shared_ptr<ArHostCloudAnchorFuture*> ar_future;
         auto jt2 = m_impl->XrContext->CloudAnchorHostingFutures.find(anchor_name);
         if (jt2 != m_impl->XrContext->CloudAnchorHostingFutures.end()) {
-            LOGD("Cloud Hosting future!\n");
+            //LOGD("Cloud Hosting future!\n");
             ar_future = jt2->second;
             ArFutureState ar_future_state;
-            LOGD("GTAP future bef get state!\n");
+            //LOGD("GTAP future bef get state!\n");
             ArFuture_getState(m_impl->XrContext->Session, reinterpret_cast<ArFuture*>(*ar_future), &ar_future_state);
-            LOGD("GTAP future af get state!\n");
+            //LOGD("GTAP future af get state!\n");
             if (ar_future_state == AR_FUTURE_STATE_DONE) {
-                LOGD("GTAP future bef acq result anchor!\n");
+                //LOGD("GTAP future bef acq result anchor!\n");
                 char* out_cloud_anchor_id_char = NULL;
                 ArHostCloudAnchorFuture_acquireResultCloudAnchorId(
                         m_impl->XrContext->Session,
                         *ar_future,
                         &out_cloud_anchor_id_char
                 );
-                LOGD("GTAP future af acq result anchor!\n");
+                //LOGD("GTAP future af acq result anchor!\n");
                 if (out_cloud_anchor_id_char == NULL) return;
-                LOGD("GTAP future result anchor id not null!\n");
+                //LOGD("GTAP future result anchor id not null!\n");
                 *out_cloud_anchor_id = std::string(out_cloud_anchor_id_char);
 
                 *out_error = false;
@@ -1789,7 +1789,7 @@ namespace xr
                     (void) context;
                     (void) anchor;
                     (void) cloud_anchor_state;
-                    LOGD("In cloud anchor resolve callback");
+                    //LOGD("In cloud anchor resolve callback");
                     },
                     &ar_future
         );
@@ -1797,7 +1797,7 @@ namespace xr
         if (ar_future == NULL) return;
         auto future_ptr = std::make_shared<ArResolveCloudAnchorFuture*>(ar_future);
         //auto future_ptr = std::make_shared<ArFuture*>(ar_future);
-        m_impl->XrContext->CloudAnchorResolvingFutures.emplace(anchor_name, std::move(future_ptr));
+        m_impl->XrContext->CloudAnchorResolvingFutures[anchor_name] = std::move(future_ptr);
         // This anchor can't be used immediately; check its ArTrackingState
         // and ArTerrainAnchorState before rendering content on this anchor.
         if (anchor_status != AR_SUCCESS) return;
@@ -1821,7 +1821,7 @@ namespace xr
                 auto jt = m_impl->XrContext->EarthAnchors.find(anchor_name);
                 if (jt != m_impl->XrContext->EarthAnchors.end()) {
                     ar_anchor = jt->second;
-                    LOGD("Add Cloud Anchor in anchor name! %s\n", anchor_name.c_str());
+                    //LOGD("Add Cloud Anchor in anchor name! %s\n", anchor_name.c_str());
                     auto anchor_status = ArSession_hostCloudAnchorAsync(
                             m_impl->XrContext->Session,
                             *ar_anchor,
@@ -1830,13 +1830,13 @@ namespace xr
                                 (void) context;
                                 (void) cloud_anchor_id;
                                 (void) cloud_anchor_state;
-                                LOGD("Add Cloud Anchor in cb!\n");
+                                //LOGD("Add Cloud Anchor in cb!\n");
                             }, &ar_future);
 
                     if (ar_future == NULL) return;
                     auto future_ptr = std::make_shared<ArHostCloudAnchorFuture *>(ar_future);
                     //auto future_ptr = std::make_shared<ArFuture*>(ar_future);
-                    m_impl->XrContext->CloudAnchorHostingFutures.emplace(anchor_name, std::move(future_ptr));
+                    m_impl->XrContext->CloudAnchorHostingFutures[anchor_name] = std::move(future_ptr);
                     // This anchor can't be used immediately; check its ArTrackingState
                     // and ArTerrainAnchorState before rendering content on this anchor.
                     if (anchor_status != AR_SUCCESS) return;
@@ -1926,7 +1926,7 @@ namespace xr
                 if (anchor == NULL) return;
                 //LOGD("AEA anchor save e_anchor not null\n");
                 auto anchor_ptr = std::make_shared<ArAnchor*>(anchor);
-                m_impl->XrContext->EarthAnchors.emplace(anchor_name, std::move(anchor_ptr));
+                m_impl->XrContext->EarthAnchors[anchor_name] = std::move(anchor_ptr);
                 *out_placed = true;
 
                 ArHitResult_destroy(ar_hit);
@@ -2039,26 +2039,26 @@ namespace xr
             std::shared_ptr<ArResolveAnchorOnTerrainFuture*> ar_future;
             auto jt2 = m_impl->XrContext->Futures.find(anchor_name);
             if (jt2 != m_impl->XrContext->Futures.end()) {
-                LOGD("GTAP future!\n");
+                //LOGD("GTAP future!\n");
                 ar_future = jt2->second;
                 ArFutureState ar_future_state;
-                LOGD("GTAP future bef get state!\n");
+                //LOGD("GTAP future bef get state!\n");
                 ArFuture_getState(m_impl->XrContext->Session, reinterpret_cast<ArFuture*>(*ar_future), &ar_future_state);
-                LOGD("GTAP future af get state!\n");
+                //LOGD("GTAP future af get state!\n");
                 if (ar_future_state == AR_FUTURE_STATE_DONE) {
                     ArAnchor* earth_anchor = NULL;
-                    LOGD("GTAP future bef acq result anchor!\n");
+                    //LOGD("GTAP future bef acq result anchor!\n");
                     ArResolveAnchorOnTerrainFuture_acquireResultAnchor(m_impl->XrContext->Session,
                                                                        *ar_future, &earth_anchor);
 
-                    LOGD("GTAP future af acq result anchor!\n");
+                    //LOGD("GTAP future af acq result anchor!\n");
                     auto earth_anchor_ptr = std::make_shared<ArAnchor*>(earth_anchor);
-                    m_impl->XrContext->EarthAnchors.emplace(anchor_name, std::move(earth_anchor_ptr));
-                    LOGD("GTAP future af emplace!\n");
+                    m_impl->XrContext->EarthAnchors[anchor_name] = std::move(earth_anchor_ptr);
+                    //LOGD("GTAP future af emplace!\n");
                     ArTrackingState tracking_state;
-                    LOGD("GTAP future bef get tracking state!\n");
+                    //LOGD("GTAP future bef get tracking state!\n");
                     ArAnchor_getTrackingState(m_impl->XrContext->Session, earth_anchor, &tracking_state);
-                    LOGD("GTAP future af get tracking state!\n");
+                    //LOGD("GTAP future af get tracking state!\n");
                     if (tracking_state == AR_TRACKING_STATE_TRACKING) {
                         ArPose *out_pose = NULL;
                         ArPose_create(m_impl->XrContext->Session, NULL, &out_pose);
@@ -2073,34 +2073,34 @@ namespace xr
                 std::shared_ptr<ArResolveCloudAnchorFuture*> ar_future;
                 auto jt2 = m_impl->XrContext->CloudAnchorResolvingFutures.find(anchor_name);
                 if (jt2 != m_impl->XrContext->CloudAnchorResolvingFutures.end()) {
-                    LOGD("Cloud resolving future!\n");
+                    //LOGD("Cloud resolving future!\n");
                     ar_future = jt2->second;
                     ArFutureState ar_future_state;
-                    LOGD("GTAP future bef get state!\n");
+                    //LOGD("GTAP future bef get state!\n");
                     ArFuture_getState(m_impl->XrContext->Session, reinterpret_cast<ArFuture*>(*ar_future), &ar_future_state);
-                    LOGD("GTAP future af get state!\n");
-                    LOGD("GTAP future cloud state is %d\n", ar_future_state);
+                    //LOGD("GTAP future af get state!\n");
+                    //LOGD("GTAP future cloud state is %d\n", ar_future_state);
                     if (ar_future_state == AR_FUTURE_STATE_DONE) {
                         ArAnchor* earth_anchor = NULL;
-                        LOGD("GTAP future bef acq result anchor!\n");
+                        //LOGD("GTAP future bef acq result anchor!\n");
                         ArCloudAnchorState cloud_anchor_state;
                         ArResolveCloudAnchorFuture_getResultCloudAnchorState(m_impl->XrContext->Session,
                                                                            *ar_future, &cloud_anchor_state);
-                        LOGD("GTAP future bef cloud anchor state!\n");
-                        LOGD("GTAP cloud anchor state: %d\n", cloud_anchor_state);
+                        //LOGD("GTAP future bef cloud anchor state!\n");
+                        //LOGD("GTAP cloud anchor state: %d\n", cloud_anchor_state);
                         if (cloud_anchor_state == AR_CLOUD_ANCHOR_STATE_SUCCESS) {
                             ArResolveCloudAnchorFuture_acquireResultAnchor(m_impl->XrContext->Session,
                                                                            *ar_future, &earth_anchor);
-                            LOGD("GTAP future af acq result anchor!\n");
+                            //LOGD("GTAP future af acq result anchor!\n");
                             auto earth_anchor_ptr = std::make_shared<ArAnchor*>(earth_anchor);
-                            m_impl->XrContext->EarthAnchors.emplace(anchor_name, std::move(earth_anchor_ptr));
-                            LOGD("GTAP future af emplace!\n");
+                            m_impl->XrContext->EarthAnchors[anchor_name] = std::move(earth_anchor_ptr);
+                            //LOGD("GTAP future af emplace!\n");
                             ArTrackingState tracking_state;
-                            LOGD("GTAP future bef get tracking state!\n");
+                            //LOGD("GTAP future bef get tracking state!\n");
                             ArAnchor_getTrackingState(m_impl->XrContext->Session, earth_anchor, &tracking_state);
-                            LOGD("GTAP future af get tracking state!\n");
+                            //LOGD("GTAP future af get tracking state!\n");
                             if (tracking_state == AR_TRACKING_STATE_TRACKING) {
-                                LOGD("GTAP future af get tracking state, State is tracking!\n");
+                                //LOGD("GTAP future af get tracking state, State is tracking!\n");
                                 ArPose *out_pose = NULL;
                                 ArPose_create(m_impl->XrContext->Session, NULL, &out_pose);
                                 ArAnchor_getPose(m_impl->XrContext->Session, earth_anchor, out_pose);
@@ -2125,7 +2125,7 @@ namespace xr
                 //ArAnchor* earth_anchor = NULL;
                 ArResolveAnchorOnTerrainFuture* ar_future = NULL;
 
-                LOGD("Add Terrain Anchor in anchor name! %s\n", anchor_name.c_str());
+                //LOGD("Add Terrain Anchor in anchor name! %s\n", anchor_name.c_str());
                 auto anchor_status = ArEarth_resolveAnchorOnTerrainAsync(
                         m_impl->XrContext->Session, m_impl->XrContext->Earth,
                         /* Locational values */
@@ -2134,13 +2134,13 @@ namespace xr
                             (void) context;
                             (void) anchor;
                             (void) terrain_anchor_state;
-                            LOGD("Add Terrain Anchor in cb!\n");
+                            //LOGD("Add Terrain Anchor in cb!\n");
                         }, &ar_future);
 
                 if (ar_future == NULL) return;
                 auto future_ptr = std::make_shared<ArResolveAnchorOnTerrainFuture*>(ar_future);
                 //auto future_ptr = std::make_shared<ArFuture*>(ar_future);
-                m_impl->XrContext->Futures.emplace(anchor_name, std::move(future_ptr));
+                m_impl->XrContext->Futures[anchor_name] = std::move(future_ptr);
                 // This anchor can't be used immediately; check its ArTrackingState
                 // and ArTerrainAnchorState before rendering content on this anchor.
                 if (anchor_status != AR_SUCCESS) return;
@@ -2174,7 +2174,7 @@ namespace xr
                 if (earth_anchor == NULL) return;
                 //LOGD("AEA anchor save e_anchor not null\n");
                 auto earth_anchor_ptr = std::make_shared<ArAnchor*>(earth_anchor);
-                m_impl->XrContext->EarthAnchors.emplace(anchor_name, std::move(earth_anchor_ptr));
+                m_impl->XrContext->EarthAnchors[anchor_name] = std::move(earth_anchor_ptr);
                 *out_placed = true;
             }
         }
