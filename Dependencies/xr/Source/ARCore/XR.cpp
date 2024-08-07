@@ -162,8 +162,39 @@ namespace xr
             uniform sampler2D babylonTexture;
             uniform sampler2D depthTexture;
             out vec4 oFragColor;
+            const float kMidDepthMeters = 8.0;
+            const float kMaxDepthMeters = 30.0;
+            
+            float DepthGetMillimeters(in sampler2D depth_texture, in vec2 depth_uv) {
+              // Depth is packed into the red and green components of its texture.
+              // The texture is a normalized format, storing millimeters.
+              vec3 packedDepthAndVisibility = texture2D(depth_texture, depth_uv).xyz;
+              return dot(packedDepthAndVisibility.xy, vec2(255.0, 256.0 * 255.0));
+            }
+            
+            // Returns linear interpolation position of value between min and max bounds.
+            // E.g. InverseLerp(1100, 1000, 2000) returns 0.1.
+            float InverseLerp(float value, float min_bound, float max_bound) {
+              return clamp((value - min_bound) / (max_bound - min_bound), 0.0, 1.0);
+            }
+
+            
             void main() {
-                oFragColor = texture(depthTexture, babylonUV); //Depth texture visualization only (testing)
+                float depth_mm = DepthGetMillimeters(depthTexture, babylonUV);
+                  float depth_meters = depth_mm * 0.001;
+                
+                  // Selects the portion of the color palette to use.
+                  float normalized_depth = 0.0;
+                  if (depth_meters < kMidDepthMeters) {
+                    // Short-range depth (0m to 8m) maps to first half of the color palette.
+                    normalized_depth = InverseLerp(depth_meters, 0.0, kMidDepthMeters) * 0.5;
+                  } else {
+                    // Long-range depth (8m to 30m) maps to second half of the color palette.
+                    normalized_depth =
+                        InverseLerp(depth_meters, kMidDepthMeters, kMaxDepthMeters) * 0.5 + 0.5;
+                  }
+                
+                oFragColor = vec4(normalized_depth, 0.0, 0.0 , 1.0);//texture(depthTexture, babylonUV); //Depth texture visualization only (testing)
             }
         )"};
 
