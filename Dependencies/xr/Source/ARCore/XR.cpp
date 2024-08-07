@@ -194,7 +194,7 @@ namespace xr
                         InverseLerp(depth_meters, kMidDepthMeters, kMaxDepthMeters) * 0.5 + 0.5;
                   }
                 
-                oFragColor = vec4(normalized_depth, 0.0, 0.0 , 1.0);//texture(depthTexture, babylonUV); //Depth texture visualization only (testing)
+                oFragColor = vec4(0.0, 0.0, normalized_depth, 1.0);//texture(depthTexture, babylonUV); //Depth texture visualization only (testing)
             }
         )"};
 
