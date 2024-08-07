@@ -227,13 +227,12 @@ namespace xr
             void main() {
                 vec4 baseColor = texture(babylonTexture, babylonUV);
                 //baseColor.w = unpackAlpha(baseColor.w);
-                //baseColor.y = unpackAlpha(baseColor.w) * DepthGetVisibility(depthTexture, babylonUV, unpackDepth(baseColor.w) * 64.0 * 1000.0);
+                baseColor.w = unpackAlpha(baseColor.w) * DepthGetVisibility(depthTexture, babylonUV, unpackDepth(baseColor.w) * 64.0 * 1000.0);
                 oFragColor = baseColor;  //Depth texture visualization only (testing)
-
             }
         )"};
 
-        bool CheckARCoreInstallStatus(bool requestInstall)
+        bool CheckARCoreInstallStatus(bol requestInstall)
         {
             ArInstallStatus install_status;
             ArStatus installStatus{ ArCoreApk_requestInstall(GetEnvForCurrentThread(), GetCurrentActivity(), requestInstall, &install_status) };
