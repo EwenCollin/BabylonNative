@@ -168,7 +168,7 @@ namespace xr
             float DepthGetMillimeters(in sampler2D depth_texture, in vec2 depth_uv) {
               // Depth is packed into the red and green components of its texture.
               // The texture is a normalized format, storing millimeters.
-              vec3 packedDepthAndVisibility = texture2D(depth_texture, depth_uv).xyz;
+              vec3 packedDepthAndVisibility = texture(depth_texture, depth_uv).xyz;
               return dot(packedDepthAndVisibility.xy, vec2(255.0, 256.0 * 255.0));
             }
             
