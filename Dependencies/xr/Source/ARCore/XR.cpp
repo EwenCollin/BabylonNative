@@ -424,7 +424,7 @@ namespace xr
                 ArSession_isDepthModeSupported(xrContext->Session, AR_DEPTH_MODE_AUTOMATIC,
                                                &is_depth_supported);
                 if (is_depth_supported) {
-                  ArConfig_setDepthMode(xrContext->Session, ar_config, AR_DEPTH_MODE_AUTOMATIC);
+                  ArConfig_setDepthMode(xrContext->Session, arConfig, AR_DEPTH_MODE_AUTOMATIC);
                 }
 
 
@@ -722,7 +722,7 @@ namespace xr
                 // Retrieve the depth image for the current frame, if available.
                 ArImage* depth_image = NULL;
                 // If a depth image is available, use it here.
-                if (ArFrame_acquireDepthImage16Bits(xrContext->Session, ar_frame, &depth_image) ==
+                if (ArFrame_acquireDepthImage16Bits(xrContext->Session, xrContext->Frame, &depth_image) ==
                     AR_SUCCESS) {
                     int image_width = 0;
                       int image_height = 0;
