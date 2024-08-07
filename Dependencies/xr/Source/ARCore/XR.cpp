@@ -177,24 +177,58 @@ namespace xr
             float InverseLerp(float value, float min_bound, float max_bound) {
               return clamp((value - min_bound) / (max_bound - min_bound), 0.0, 1.0);
             }
+            
+            float unpackDepth(float packedValue) {
+                int intValue = int(packedValue * 65535.0);
+    
+                // Extract depth (lower 8 bits)
+                return float(intValue % 256) / 255.0;
+            }
+
+            float unpackAlpha(float packedValue) {
+                int intValue = int(packedValue * 65535.0);
+                
+                // Extract alpha (higher 8 bits)
+                return float(intValue / 256) / 255.0;
+            }
+            float DepthGetVisibility(in sampler2D depth_texture, in vec2 depth_uv,
+                                     in float asset_depth_mm) {
+              float depth_mm = DepthGetMillimeters(depth_texture, depth_uv);
+            
+              // Instead of a hard Z-buffer test, allow the asset to fade into the
+              // background along a 2 * kDepthTolerancePerMm * asset_depth_mm
+              // range centered on the background depth.
+              const float kDepthTolerancePerMm = 0.015f;
+              float visibility_occlusion = clamp(0.5 * (depth_mm - asset_depth_mm) /
+                (kDepthTolerancePerMm * asset_depth_mm) + 0.5, 0.0, 1.0);
+            
+             // Use visibility_depth_near to set the minimum depth value. If using
+             // this value for occlusion, avoid setting it too close to zero. A depth value
+             // of zero signifies that there is no depth data to be found.
+              float visibility_depth_near = 1.0 - InverseLerp(
+                  depth_mm, /*min_depth_mm=*/150.0, /*max_depth_mm=*/200.0);
+            
+              // Use visibility_depth_far to set the maximum depth value. If the depth
+              // value is too high (outside the range specified by visibility_depth_far),
+              // the virtual object may get inaccurately occluded at further distances
+              // due to too much noise.
+              float visibility_depth_far = InverseLerp(
+                  depth_mm, /*min_depth_mm=*/7500.0, /*max_depth_mm=*/8000.0);
+            
+              const float kOcclusionAlpha = 0.0f;
+              float visibility =
+                  max(max(visibility_occlusion, kOcclusionAlpha),
+                      max(visibility_depth_near, visibility_depth_far));
+            
+              return visibility;
+            }
 
             
             void main() {
-                float depth_mm = DepthGetMillimeters(depthTexture, babylonUV);
-                  float depth_meters = depth_mm * 0.001;
-                
-                  // Selects the portion of the color palette to use.
-                  float normalized_depth = 0.0;
-                  if (depth_meters < kMidDepthMeters) {
-                    // Short-range depth (0m to 8m) maps to first half of the color palette.
-                    normalized_depth = InverseLerp(depth_meters, 0.0, kMidDepthMeters) * 0.5;
-                  } else {
-                    // Long-range depth (8m to 30m) maps to second half of the color palette.
-                    normalized_depth =
-                        InverseLerp(depth_meters, kMidDepthMeters, kMaxDepthMeters) * 0.5 + 0.5;
-                  }
-                
-                oFragColor = vec4(0.0, 0.0, normalized_depth, 1.0);//texture(depthTexture, babylonUV); //Depth texture visualization only (testing)
+                vec4 baseColor = texture(depthTexture, babylonUV);
+                baseColor.a = unpackAlpha(baseColor.a) * DepthGetVisibility(depthTexture, babylonUV.yx, unpackDepth(baseColor.a) * 64.0 * 1000.0);
+                oFragColor = baseColor;//vec4(0.0, 0.0, normalized_depth, 1.0);//texture(depthTexture, babylonUV); //Depth texture visualization only (testing)
+
             }
         )"};
 
