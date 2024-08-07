@@ -421,10 +421,10 @@ namespace xr
                                             AR_CLOUD_ANCHOR_MODE_ENABLED);
                 // Check whether the user's device supports the Depth API.
                 int32_t is_depth_supported = 0;
-                ArSession_isDepthModeSupported(ar_session, AR_DEPTH_MODE_AUTOMATIC,
+                ArSession_isDepthModeSupported(xrContext->Session, AR_DEPTH_MODE_AUTOMATIC,
                                                &is_depth_supported);
                 if (is_depth_supported) {
-                  ArConfig_setDepthMode(ar_session, ar_config, AR_DEPTH_MODE_AUTOMATIC);
+                  ArConfig_setDepthMode(xrContext->Session, ar_config, AR_DEPTH_MODE_AUTOMATIC);
                 }
 
 
@@ -722,7 +722,7 @@ namespace xr
                 // Retrieve the depth image for the current frame, if available.
                 ArImage* depth_image = NULL;
                 // If a depth image is available, use it here.
-                if (ArFrame_acquireDepthImage16Bits(ar_session, ar_frame, &depth_image) ==
+                if (ArFrame_acquireDepthImage16Bits(xrContext->Session, ar_frame, &depth_image) ==
                     AR_SUCCESS) {
                     int image_width = 0;
                       int image_height = 0;
@@ -730,17 +730,17 @@ namespace xr
                       int image_row_stride = 0;
                     const uint8_t* depth_data = nullptr;
                       int plane_size_bytes = 0;
-                      ArImage_getPlaneData(&session, depth_image, /*plane_index=*/0, &depth_data,
+                      ArImage_getPlaneData(xrContext->Session, depth_image, /*plane_index=*/0, &depth_data,
                                            &plane_size_bytes);
                     
                       // Bails out if there's no depth_data.
                       if (depth_data != nullptr) {
-                          ArImage_getWidth(&session, depth_image, &image_width);
-                          ArImage_getHeight(&session, depth_image, &image_height);
-                          ArImage_getPlanePixelStride(&session, depth_image, 0, &image_pixel_stride);
-                          ArImage_getPlaneRowStride(&session, depth_image, 0, &image_row_stride);
+                          ArImage_getWidth(xrContext->Session, depth_image, &image_width);
+                          ArImage_getHeight(xrContext->Session, depth_image, &image_height);
+                          ArImage_getPlanePixelStride(xrContext->Session, depth_image, 0, &image_pixel_stride);
+                          ArImage_getPlaneRowStride(xrContext->Session, depth_image, 0, &image_row_stride);
                           ArImage_release(depth_image);
-                          glBindTexture(GL_TEXTURE_2D, texture_id_);
+                          glBindTexture(GL_TEXTURE_2D, depthTextureId);
                           glTexImage2D(GL_TEXTURE_2D, 0, GL_RG8, image_width, image_height, 0, GL_RG,
                                        GL_UNSIGNED_BYTE, depth_data);
                             auto depthTextureUniformLocation{ glGetUniformLocation(babylonShaderProgramId, "depthTexture") };
