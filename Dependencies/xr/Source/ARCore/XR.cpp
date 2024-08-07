@@ -160,9 +160,10 @@ namespace xr
             precision mediump float;
             in vec2 babylonUV;
             uniform sampler2D babylonTexture;
+            uniform sampler2D depthTexture;
             out vec4 oFragColor;
             void main() {
-                oFragColor = texture(babylonTexture, babylonUV);
+                oFragColor = texture(depthTexture, babylonUV); //Depth texture visualization only (testing)
             }
         )"};
 
@@ -310,6 +311,7 @@ namespace xr
                 ArTrackable_release(reinterpret_cast<ArTrackable*>(xrContext->Earth));
 
                 glDeleteTextures(1, &cameraTextureId);
+                glDeleteTextures(1, &depthTextureId);
                 glDeleteProgram(cameraShaderProgramId);
                 glDeleteProgram(babylonShaderProgramId);
                 glDeleteFramebuffers(1, &cameraFrameBufferId);
@@ -384,6 +386,15 @@ namespace xr
                 glBindTexture(GL_TEXTURE_EXTERNAL_OES, 0);
             }
 
+            {
+                  glGenTextures(1, &depthTextureId);
+                  glBindTexture(GL_TEXTURE_2D, depthTextureId);
+                  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+                  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+                  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            }
+
             // Create the shader program used for drawing the full screen quad that is the camera frame + Babylon render texture
             cameraShaderProgramId = android::OpenGLHelpers::CreateShaderProgram(CAMERA_VERT_SHADER, CAMERA_FRAG_SHADER);
             babylonShaderProgramId = android::OpenGLHelpers::CreateShaderProgram(BABYLON_VERT_SHADER, BABYLON_FRAG_SHADER);
@@ -408,6 +419,14 @@ namespace xr
                 ArConfig_setGeospatialMode(xrContext->Session, arConfig, AR_GEOSPATIAL_MODE_ENABLED);
                 ArConfig_setCloudAnchorMode(xrContext->Session, arConfig,
                                             AR_CLOUD_ANCHOR_MODE_ENABLED);
+                // Check whether the user's device supports the Depth API.
+                int32_t is_depth_supported = 0;
+                ArSession_isDepthModeSupported(ar_session, AR_DEPTH_MODE_AUTOMATIC,
+                                               &is_depth_supported);
+                if (is_depth_supported) {
+                  ArConfig_setDepthMode(ar_session, ar_config, AR_DEPTH_MODE_AUTOMATIC);
+                }
+
 
                 // Configure the ArSession
                 ArStatus statusConfig { ArSession_configure(xrContext->Session, arConfig) };
@@ -700,6 +719,49 @@ namespace xr
                 auto babylonTextureId{ static_cast<GLuint>(reinterpret_cast<uintptr_t>(ActiveFrameViews[0].ColorTexturePointer)) };
                 glBindTexture(GL_TEXTURE_2D, babylonTextureId);
                 glBindSampler(GetTextureUnit(GL_TEXTURE0), 0);
+                // Retrieve the depth image for the current frame, if available.
+                ArImage* depth_image = NULL;
+                // If a depth image is available, use it here.
+                if (ArFrame_acquireDepthImage16Bits(ar_session, ar_frame, &depth_image) ==
+                    AR_SUCCESS) {
+                    int image_width = 0;
+                      int image_height = 0;
+                      int image_pixel_stride = 0;
+                      int image_row_stride = 0;
+                    const uint8_t* depth_data = nullptr;
+                      int plane_size_bytes = 0;
+                      ArImage_getPlaneData(&session, depth_image, /*plane_index=*/0, &depth_data,
+                                           &plane_size_bytes);
+                    
+                      // Bails out if there's no depth_data.
+                      if (depth_data != nullptr) {
+                          ArImage_getWidth(&session, depth_image, &image_width);
+                          ArImage_getHeight(&session, depth_image, &image_height);
+                          ArImage_getPlanePixelStride(&session, depth_image, 0, &image_pixel_stride);
+                          ArImage_getPlaneRowStride(&session, depth_image, 0, &image_row_stride);
+                          ArImage_release(depth_image);
+                          glBindTexture(GL_TEXTURE_2D, texture_id_);
+                          glTexImage2D(GL_TEXTURE_2D, 0, GL_RG8, image_width, image_height, 0, GL_RG,
+                                       GL_UNSIGNED_BYTE, depth_data);
+                            auto depthTextureUniformLocation{ glGetUniformLocation(babylonShaderProgramId, "depthTexture") };
+                            glUniform1i(depthTextureUniformLocation, GetTextureUnit(GL_TEXTURE1));
+                            glActiveTexture(GL_TEXTURE1);
+                            
+                            glBindTexture(GL_TEXTURE_2D, depthTextureId);
+                            glBindSampler(GetTextureUnit(GL_TEXTURE1), 0);
+                      } else {
+                          ArImage_release(depth_image);
+                      }
+                    
+                } else {
+                    
+                  // No depth image received for this frame.
+                  // This normally means that depth data is not available yet.
+                  // Depth data will not be available if there are no tracked
+                  // feature points. This can happen when there is no motion, or when the
+                  // camera loses its ability to track objects in the surrounding
+                  // environment.
+                }
 
                 // Draw the quad
                 glDrawArrays(GL_TRIANGLE_STRIP, 0, VERTEX_COUNT);
@@ -1309,6 +1371,7 @@ namespace xr
         GLuint cameraShaderProgramId{};
         GLuint babylonShaderProgramId{};
         GLuint cameraTextureId{};
+        GLuint depthTextureId{};
         GLuint cameraFrameBufferId{};
 
         ArPose* cameraPose{};
