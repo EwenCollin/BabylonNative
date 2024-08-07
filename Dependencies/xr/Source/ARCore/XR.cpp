@@ -232,7 +232,7 @@ namespace xr
             }
         )"};
 
-        bool CheckARCoreInstallStatus(bol requestInstall)
+        bool CheckARCoreInstallStatus(bool requestInstall)
         {
             ArInstallStatus install_status;
             ArStatus installStatus{ ArCoreApk_requestInstall(GetEnvForCurrentThread(), GetCurrentActivity(), requestInstall, &install_status) };
