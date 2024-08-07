@@ -805,6 +805,7 @@ namespace xr
                           ArImage_getPlanePixelStride(xrContext->Session, depth_image, 0, &image_pixel_stride);
                           ArImage_getPlaneRowStride(xrContext->Session, depth_image, 0, &image_row_stride);
                           ArImage_release(depth_image);
+                          glActiveTexture(GL_TEXTURE1);
                           glBindTexture(GL_TEXTURE_2D, depthTextureId);
                           glTexImage2D(GL_TEXTURE_2D, 0, GL_RG8, image_width, image_height, 0, GL_RG,
                                        GL_UNSIGNED_BYTE, depth_data);
