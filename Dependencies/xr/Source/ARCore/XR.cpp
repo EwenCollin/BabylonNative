@@ -151,7 +151,8 @@ namespace xr
             // Location 0 is GL_COLOR_ATTACHMENT0, which in turn is the babylonTexture
             layout(location = 0) out vec4 oFragColor;
             void main() {
-                vec4 camColor = texture(cameraTexture, vec2(cameraFrameUV.x, cameraFrameUV.y * 0.5));
+                vec4 camColor = texture(cameraTexture, vec2(cameraFrameUV.x * 2.0, cameraFrameUV.y));
+                camColor *= step(cameraFrameUV.x * 2.0, 1.0);
                 oFragColor = camColor;
             }
         )"};
