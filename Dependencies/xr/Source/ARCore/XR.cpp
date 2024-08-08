@@ -227,9 +227,7 @@ namespace xr
             void main() {
                 vec4 baseColor = texture(babylonTexture, babylonUV);
                 //baseColor.w = 1.0;
-                baseColor.g = unpackDepth(baseColor.w) * 32.0;
-                baseColor.r = 1.0;
-                baseColor.b = 1.0;
+                baseColor.g = unpackDepth(baseColor.w);
                 baseColor.w = unpackAlpha(baseColor.w) * DepthGetVisibility(depthTexture, babylonUV, unpackDepth(baseColor.w) * 64.0 * 1000.0);
                 oFragColor = baseColor;  //Depth texture visualization only (testing)
             }
