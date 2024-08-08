@@ -759,13 +759,11 @@ namespace xr
                 glDisable(GL_SCISSOR_TEST);
                 glDisable(GL_STENCIL_TEST);
                 //glDisable(GL_BLEND);
-                //glDisable(GL_DEPTH_TEST);
+                glDisable(GL_DEPTH_TEST);
                 glDisable(GL_CULL_FACE);
 
                 glEnable(GL_BLEND);
                 glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-                glEnable(GL_DEPTH_TEST);
-                glDepthMask(GL_TRUE);
 
                 // Only write colors to blit to the screen
                 //glDepthMask(GL_FALSE);
