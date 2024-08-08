@@ -223,7 +223,7 @@ namespace xr
                 //baseColor.w = 1.0;
                 //baseColor.w = baseColor.b;
                 baseColor.r = step(0.05, baseColor.w);
-                baseColor.w = DepthGetVisibility(depthTexture, babylonUV, step(0.05, baseColor.w) * 64.0 * 1000.0);
+                baseColor.w = step(0.05, baseColor.w) * DepthGetVisibility(depthTexture, babylonUV, step(0.05, baseColor.w) * 64.0 * 1000.0);
                 oFragColor = baseColor;  //Depth texture visualization only (testing)
             }
         )"};
