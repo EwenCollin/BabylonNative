@@ -227,6 +227,7 @@ namespace xr
                 baseColor.x = baseColor.x * visibility;
                 baseColor.y = baseColor.y * visibility;
                 baseColor.z = unpackAlpha(baseColor.z) * visibility;
+                baseColor.w = baseColor.w * visibility;
                 //baseColor.x = DepthGetMillimeters(depthTexture, dUV) * 0.0005;
                 oFragColor = baseColor;  //Depth texture visualization only (testing)
             }
