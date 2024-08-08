@@ -221,8 +221,8 @@ namespace xr
             void main() {
                 vec4 baseColor = texture(babylonTexture, babylonUV);
                 //baseColor.w = 1.0;
-                //baseColor.w = baseColor.b;
-                baseColor.w *= DepthGetVisibility(depthTexture, babylonUV, baseColor.z * 64.0 * 1000.0);
+                baseColor.w = 0.0;
+                //baseColor.w *= DepthGetVisibility(depthTexture, babylonUV, baseColor.z * 64.0 * 1000.0);
                 baseColor.z = baseColor.z;
                 baseColor.x = DepthGetMillimeters(depthTexture, babylonUV) * 0.0005;
                 oFragColor = baseColor;  //Depth texture visualization only (testing)
@@ -758,12 +758,10 @@ namespace xr
                 // Disable unnecessary capabilities
                 glDisable(GL_SCISSOR_TEST);
                 glDisable(GL_STENCIL_TEST);
-                //glDisable(GL_BLEND);
+                glDisable(GL_BLEND);
                 glDisable(GL_DEPTH_TEST);
                 glDisable(GL_CULL_FACE);
-
-                glEnable(GL_BLEND);
-                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+                
 
                 // Only write colors to blit to the screen
                 //glDepthMask(GL_FALSE);
