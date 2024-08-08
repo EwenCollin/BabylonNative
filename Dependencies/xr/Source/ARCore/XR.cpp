@@ -221,15 +221,15 @@ namespace xr
 
             
             void main() {
-                vec4 camColor = texture(babylonTexture, vec2(babylonUV.x * 0.5, babylonUV.y));
-                vec4 gameColor = texture(babylonTexture, vec2((babylonUV.x * 0.5) + 0.5, babylonUV.y));
+                vec4 camColor = texture(babylonTexture, vec2(babylonUV.x, babylonUV.y * 0.5));
+                //vec4 gameColor = texture(babylonTexture, vec2((babylonUV.x * 0.5) + 0.5, babylonUV.y));
 
-                vec2 dUV = vec2(1.0 - babylonUV.y, 1.0 - babylonUV.x);
-                float visibility = DepthGetVisibility(depthTexture, dUV, unpackDepth(gameColor.z) * 64.0 * 1000.0);
-                gameColor.z = unpackAlpha(gameColor.z);
-                gameColor.a = visibility;
-                
-                vec4 baseColor = mix(camColor, gameColor, gameColor.a);//texture(babylonTexture, babylonUV);
+                //vec2 dUV = vec2(1.0 - babylonUV.y, 1.0 - babylonUV.x);
+                //float visibility = DepthGetVisibility(depthTexture, dUV, unpackDepth(gameColor.z) * 64.0 * 1000.0);
+                //gameColor.z = unpackAlpha(gameColor.z);
+                //gameColor.a = visibility;
+                vec4 baseColor = camColor;
+                //vec4 baseColor = mix(camColor, gameColor, gameColor.a);//texture(babylonTexture, babylonUV);
                 //baseColor.w = 1.0;
                 //baseColor.w = 0.0;
                 //vec2 dUV = vec2(1.0 - babylonUV.y, 1.0 - babylonUV.x);
