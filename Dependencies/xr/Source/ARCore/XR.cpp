@@ -223,11 +223,11 @@ namespace xr
                 //baseColor.w = 1.0;
                 //baseColor.w = 0.0;
                 vec2 dUV = vec2(1.0 - babylonUV.y, 1.0 - babylonUV.x);
-                float visibility = DepthGetVisibility(depthTexture, dUV, baseColor.z * 64.0 * 1000.0);
+                float visibility = DepthGetVisibility(depthTexture, dUV, unpackDepth(baseColor.z) * 64.0 * 1000.0);
                 baseColor.x = baseColor.x * visibility;
                 baseColor.y = baseColor.y * visibility;
-                baseColor.z = baseColor.z * visibility;
-                baseColor.x = DepthGetMillimeters(depthTexture, dUV) * 0.0005;
+                baseColor.z = unpackAlpha(baseColor.z) * visibility;
+                //baseColor.x = DepthGetMillimeters(depthTexture, dUV) * 0.0005;
                 oFragColor = baseColor;  //Depth texture visualization only (testing)
             }
         )"};
