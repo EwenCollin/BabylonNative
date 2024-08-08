@@ -179,10 +179,7 @@ namespace xr
             }
             
             float unpackDepth(float packedValue) {
-                int intValue = int(packedValue * 65535.0);
-    
-                // Extract depth (lower 8 bits)
-                return float(intValue % 256) / 255.0;
+                return mod(packedValue * 65535.0, 256.0) / 255.0;
             }
 
             float unpackAlpha(float packedValue) {
