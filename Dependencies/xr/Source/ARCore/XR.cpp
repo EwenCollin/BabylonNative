@@ -183,10 +183,7 @@ namespace xr
             }
 
             float unpackAlpha(float packedValue) {
-                int intValue = int(packedValue * 65535.0);
-                
-                // Extract alpha (higher 8 bits)
-                return float(intValue / 256) / 255.0;
+                return mod(floor(packedValue * 65535.0 / 256.0), 256.0) / 255.0;
             }
             float DepthGetVisibility(in sampler2D depth_texture, in vec2 depth_uv,
                                      in float asset_depth_mm) {
