@@ -221,7 +221,7 @@ namespace xr
 
             
             void main() {
-                vec4 camColor = texture(babylonTexture, vec2(babylonUV.x, babylonUV.y * 0.5));
+                vec4 camColor = texture(babylonTexture, vec2(babylonUV.x, babylonUV.y));
                 //vec4 gameColor = texture(babylonTexture, vec2((babylonUV.x * 0.5) + 0.5, babylonUV.y));
 
                 //vec2 dUV = vec2(1.0 - babylonUV.y, 1.0 - babylonUV.x);
