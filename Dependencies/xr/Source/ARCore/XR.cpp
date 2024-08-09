@@ -738,11 +738,11 @@ namespace xr
                 glDisable(GL_CULL_FACE);
 
                 // Clear the depth and stencil
-                glDepthMask(GL_TRUE);
-                glStencilMask(1);
-                glClearDepthf(1.0);
-                glClearStencil(0);
-                glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+                //glDepthMask(GL_TRUE);
+                //glStencilMask(1);
+                //glClearDepthf(1.0);
+                //glClearStencil(0);
+                //glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
                 // Only write colors to blit the background camera texture
                 glDepthMask(GL_FALSE);
