@@ -136,10 +136,13 @@ namespace xr
         constexpr char BABYLON_VERT_SHADER[]{ R"(#version 300 es
             precision highp float;
             uniform vec2 vertexPositions[4];
+            uniform vec2 cameraFrameUVs[4];
+            out vec2 cameraFrameUV;
             out vec2 babylonUV;
             void main() {
                 gl_Position = vec4(vertexPositions[gl_VertexID], 0.0, 1.0);
                 babylonUV = vec2(gl_Position.x + 1.0, gl_Position.y + 1.0) * 0.5;
+                cameraFrameUV = cameraFrameUVs[gl_VertexID];
             }
         )"};
 
@@ -152,9 +155,9 @@ namespace xr
             layout(location = 0) out vec4 oFragColor;
             void main() {
                 vec4 camColor = texture(cameraTexture, cameraFrameUV);
-                camColor.z = (floor(camColor.z * 255.0) * 256.0) / 65535.0;
+                //camColor.z = (floor(camColor.z * 255.0) * 256.0) / 65535.0;
                 //camColor *= step(cameraFrameUV.y * 2.0, 1.0);
-                oFragColor = camColor;
+                oFragColor = vec4(0.0, 0.0, 0.0, 0.0);//camColor;
             }
         )"};
 
@@ -164,6 +167,8 @@ namespace xr
             in vec2 babylonUV;
             uniform sampler2D babylonTexture;
             uniform sampler2D depthTexture;
+            in vec2 cameraFrameUV;
+            uniform samplerExternalOES cameraTexture;
             out vec4 oFragColor;
             const float kMidDepthMeters = 8.0;
             const float kMaxDepthMeters = 30.0;
@@ -222,16 +227,37 @@ namespace xr
 
             
             void main() {
-                //vec4 camColor = texture(babylonTexture, vec2(babylonUV.x * 0.5, babylonUV.y));
-                vec4 gameColor = texture(babylonTexture, babylonUV);//texture(babylonTexture, vec2((babylonUV.x * 0.5) + 0.5, babylonUV.y));
+                vec4 camColor = texture(cameraTexture, cameraFrameUV);
+                //vec4 gameColor = texture(babylonTexture, babylonUV);
+                //vec2 dUV = vec2(1.0 - babylonUV.y, 1.0 - babylonUV.x);
+                //float visibility = DepthGetVisibility(depthTexture, dUV, unpackDepth(gameColor.z) * 64.0 * 1000.0);
+                //gameColor.a *= visibility;
+                //vec4 baseColor = mix(camColor, gameColor, gameColor.a);
+                oFragColor = camColor;
+                
 
-                vec2 dUV = vec2(1.0 - babylonUV.y, 1.0 - babylonUV.x);
-                float visibility = DepthGetVisibility(depthTexture, dUV, unpackDepth(gameColor.z) * 64.0 * 1000.0);
-                gameColor.x *= visibility;
-                gameColor.y *= visibility;
-                gameColor.z *= visibility;
+
+
+
+
+
+
+
+
+
+
+
+
+                //vec4 camColor = texture(babylonTexture, vec2(babylonUV.x * 0.5, babylonUV.y));
+                //vec4 gameColor = texture(babylonTexture, babylonUV);//texture(babylonTexture, vec2((babylonUV.x * 0.5) + 0.5, babylonUV.y));
+
+                //vec2 dUV = vec2(1.0 - babylonUV.y, 1.0 - babylonUV.x);
+                //float visibility = DepthGetVisibility(depthTexture, dUV, unpackDepth(gameColor.z) * 64.0 * 1000.0);
+                //gameColor.x *= visibility;
+                //gameColor.y *= visibility;
+                //gameColor.z *= visibility;
                 //gameColor.a = visibility;
-                vec4 baseColor = gameColor;
+                //vec4 baseColor = gameColor;
                 //vec4 baseColor = mix(camColor, gameColor, gameColor.a);//texture(babylonTexture, babylonUV);
                 //baseColor.w = 1.0;
                 //baseColor.w = 0.0;
@@ -240,7 +266,7 @@ namespace xr
                 //baseColor.w = baseColor.w * visibility;
                 //baseColor.x = DepthGetMillimeters(depthTexture, dUV) * 0.0005;
                 //baseColor.y = 0.0;
-                oFragColor = baseColor;  //Depth texture visualization only (testing)
+                //oFragColor = baseColor;  //Depth texture visualization only (testing)
             }
         )"};
 
@@ -841,6 +867,16 @@ namespace xr
                   // camera loses its ability to track objects in the surrounding
                   // environment.
                 }
+                // Configure the camera texture
+                auto cameraTextureUniformLocation{ glGetUniformLocation(babylonShaderProgramId, "cameraTexture") };
+                glUniform1i(cameraTextureUniformLocation, GetTextureUnit(GL_TEXTURE2));
+                glActiveTexture(GL_TEXTURE2);
+                glBindTexture(GL_TEXTURE_EXTERNAL_OES, cameraTextureId);
+                glBindSampler(GetTextureUnit(GL_TEXTURE2), 0);
+
+                // Configure the camera frame UVs
+                auto cameraFrameUVsUniformLocation{ glGetUniformLocation(cameraShaderProgramId, "cameraFrameUVs") };
+                glUniform2fv(cameraFrameUVsUniformLocation, VERTEX_COUNT, CameraFrameUVs);
 
                 // Draw the quad
                 glDrawArrays(GL_TRIANGLE_STRIP, 0, VERTEX_COUNT);
