@@ -242,7 +242,7 @@ namespace xr
                 vec4 gameColor = baseGameColor;
                 vec4 controlColor = texture(babylonTextureCopy, vec2(0.0, 0.0));
 
-                float is_control_uv = step(-0.001, babylonUV.x + babylonUV.y) * (1.0 - step(0.001, babylonUV.x + babylonUV.y));
+                float is_control_uv = 0.0;//step(-0.001, babylonUV.x + babylonUV.y) * (1.0 - step(0.001, babylonUV.x + babylonUV.y));
 
                 vec2 dUV = cameraFrameUV;//vec2(1.0 - babylonUV.y, 1.0 - babylonUV.x);
                 float visibility = DepthGetVisibility(depthTexture, dUV, unpackDepth(gameColor.z) * 16.0 * 1000.0);
@@ -250,8 +250,8 @@ namespace xr
                 gameColor.a = step(0.01, gameColor.r + gameColor.g + gameColor.b) * step(0.001, visibility);
                 vec4 baseColor = mix(camColor, gameColor, gameColor.a);
 
-                baseColor = mix(baseColor, baseGameColor, step(1.999, controlColor.r + controlColor.g));
-                baseColor = mix(baseColor, vec4(1.0, 1.0, 0.0, 1.0), is_control_uv); 
+                //baseColor = mix(baseColor, baseGameColor, step(1.999, controlColor.r + controlColor.g));
+                //baseColor = mix(baseColor, vec4(1.0, 1.0, 0.0, 1.0), is_control_uv); 
                 oFragColor = baseColor;
                 
 
