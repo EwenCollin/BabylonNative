@@ -875,7 +875,7 @@ namespace xr
                 glBindSampler(GetTextureUnit(GL_TEXTURE2), 0);
 
                 // Configure the camera frame UVs
-                auto cameraFrameUVsUniformLocation{ glGetUniformLocation(cameraShaderProgramId, "cameraFrameUVs") };
+                auto cameraFrameUVsUniformLocation{ glGetUniformLocation(babylonShaderProgramId, "cameraFrameUVs") };
                 glUniform2fv(cameraFrameUVsUniformLocation, VERTEX_COUNT, CameraFrameUVs);
 
                 // Draw the quad
