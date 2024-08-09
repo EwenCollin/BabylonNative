@@ -229,9 +229,9 @@ namespace xr
             void main() {
                 vec4 camColor = texture(cameraTexture, cameraFrameUV);
                 vec4 gameColor = texture(babylonTexture, babylonUV);
-                //vec2 dUV = vec2(1.0 - babylonUV.y, 1.0 - babylonUV.x);
-                //float visibility = DepthGetVisibility(depthTexture, dUV, unpackDepth(gameColor.z) * 64.0 * 1000.0);
-                gameColor.a = step(0.01, gameColor.r + gameColor.g + gameColor.b);//*= visibility;
+                vec2 dUV = vec2(1.0 - babylonUV.y, 1.0 - babylonUV.x);
+                float visibility = DepthGetVisibility(depthTexture, dUV, unpackDepth(gameColor.z) * 64.0 * 1000.0);
+                gameColor.a = step(0.01, gameColor.r + gameColor.g + gameColor.b) * visibility;
                 vec4 baseColor = mix(camColor, gameColor, gameColor.a);
                 oFragColor = baseColor;
                 
