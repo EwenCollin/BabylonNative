@@ -245,8 +245,8 @@ namespace xr
                 float is_control_uv = 0.0;//step(-0.001, babylonUV.x + babylonUV.y) * (1.0 - step(0.001, babylonUV.x + babylonUV.y));
 
                 vec2 dUV = cameraFrameUV;//vec2(1.0 - babylonUV.y, 1.0 - babylonUV.x);
-                float visibility = DepthGetVisibility(depthTexture, dUV, gameColor.z * 16.0 * 1000.0);//unpackDepth(gameColor.z) * 16.0 * 1000.0);
-                gameColor.z = 0.0;
+                float visibility = DepthGetVisibility(depthTexture, dUV, unpackDepth(gameColor.z) * 16.0 * 1000.0);//gameColor.z * 16.0 * 1000.0);//
+                //gameColor.z = 0.0;
                 //gameColor.z = unpackAlpha(gameColor.z);
                 gameColor.a = step(0.01, gameColor.r + gameColor.g + gameColor.b) * step(0.001, visibility);
                 vec4 baseColor = mix(camColor, gameColor, gameColor.a);
@@ -885,13 +885,6 @@ namespace xr
                 auto vertexPositionsUniformLocation{ glGetUniformLocation(babylonShaderProgramId, "vertexPositions") };
                 glUniform2fv(vertexPositionsUniformLocation, VERTEX_COUNT, VERTEX_POSITIONS);
 
-                // Configure the babylon render texture
-                auto babylonTextureUniformLocation{ glGetUniformLocation(babylonShaderProgramId, "babylonTexture") };
-                glUniform1i(babylonTextureUniformLocation, GetTextureUnit(GL_TEXTURE0));
-                glActiveTexture(GL_TEXTURE0);
-                
-                glBindTexture(GL_TEXTURE_2D, babylonTextureId);
-                glBindSampler(GetTextureUnit(GL_TEXTURE0), 0);
                 // Retrieve the depth image for the current frame, if available.
                 ArImage* depth_image = NULL;
                 // If a depth image is available, use it here.
@@ -955,6 +948,13 @@ namespace xr
                 glBindSampler(GetTextureUnit(GL_TEXTURE3), 0);
 
                 
+                // Configure the babylon render texture
+                auto babylonTextureUniformLocation{ glGetUniformLocation(babylonShaderProgramId, "babylonTexture") };
+                glUniform1i(babylonTextureUniformLocation, GetTextureUnit(GL_TEXTURE0));
+                glActiveTexture(GL_TEXTURE0);
+                
+                glBindTexture(GL_TEXTURE_2D, babylonTextureId);
+                glBindSampler(GetTextureUnit(GL_TEXTURE0), 0);
 
                 // Draw the quad
                 glDrawArrays(GL_TRIANGLE_STRIP, 0, VERTEX_COUNT);
