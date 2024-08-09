@@ -188,7 +188,7 @@ namespace xr
             }
             
             float unpackDepth(float packedValue) {
-                return mod(packedValue * 65535.0, 256.0) / 255.0;
+                return mod(packedValue * 16383.0, 128.0) / 127.0;
             }
 
             float unpackAlpha(float packedValue) {
