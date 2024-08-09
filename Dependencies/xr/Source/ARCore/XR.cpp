@@ -256,7 +256,7 @@ namespace xr
                 vec3 rgb = hsv2rgb(vec3(gameColor.x, gameColor.y, unpackDepth(gameColor.y)));
                 //gameColor.z = 0.0;
                 //gameColor.z = unpackAlpha(gameColor.z);
-                gameColor.a = step(0.01, gameColor.r + gameColor.g + gameColor.b) * step(0.001, visibility);
+                gameColor.a = step(0.01, gameColor.r + gameColor.g + gameColor.b) * visibility;// step(0.001, visibility);
                 gameColor.r = rgb.r;
                 gameColor.g = rgb.g;
                 gameColor.b = rgb.b;
