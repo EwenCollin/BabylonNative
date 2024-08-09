@@ -187,13 +187,22 @@ namespace xr
               return clamp((value - min_bound) / (max_bound - min_bound), 0.0, 1.0);
             }
             
+            //float unpackDepth(float packedValue) {
+            //    return mod(packedValue * 16383.0, 128.0) / 127.0;
+            //}
+
+            //float unpackAlpha(float packedValue) {
+            //    return floor(mod(floor(packedValue * 16383.0 / 128.0), 128.0)) / 127.0;
+            //}
+
             float unpackDepth(float packedValue) {
-                return mod(packedValue * 16383.0, 128.0) / 127.0;
+                return (packedValue - (floor(packedValue * 10.0) * 0.1)) * 10.0;
             }
 
             float unpackAlpha(float packedValue) {
-                return floor(mod(floor(packedValue * 16383.0 / 128.0), 128.0)) / 127.0;
+                return floor(packedValue * 10.0) * 0.1;
             }
+
             float DepthGetVisibility(in sampler2D depth_texture, in vec2 depth_uv,
                                      in float asset_depth_mm) {
               float depth_mm = DepthGetMillimeters(depth_texture, depth_uv);
