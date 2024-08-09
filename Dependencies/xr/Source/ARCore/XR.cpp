@@ -192,7 +192,7 @@ namespace xr
             }
 
             float unpackAlpha(float packedValue) {
-                return mod(floor(packedValue * 65535.0 / 256.0), 256.0) / 255.0;
+                return floor(mod(floor(packedValue * 16383.0 / 128.0), 128.0)) / 127.0;
             }
             float DepthGetVisibility(in sampler2D depth_texture, in vec2 depth_uv,
                                      in float asset_depth_mm) {
@@ -232,6 +232,7 @@ namespace xr
                 vec4 gameColor = texture(babylonTextureCopy, babylonUV);
                 vec2 dUV = vec2(1.0 - babylonUV.y, 1.0 - babylonUV.x);
                 float visibility = DepthGetVisibility(depthTexture, dUV, unpackDepth(gameColor.z) * 16.0 * 1000.0);
+                gameColor.z = unpackAlpha(gameColor.z);
                 gameColor.a = step(0.01, gameColor.r + gameColor.g + gameColor.b) * visibility;
                 vec4 baseColor = mix(camColor, gameColor, gameColor.a);
                 oFragColor = baseColor;
