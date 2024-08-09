@@ -235,6 +235,13 @@ namespace xr
               return visibility;
             }
 
+            vec3 hsv2rgb(vec3 c)
+            {
+                vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+                vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+                return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+            }
+
             
             void main() {
                 vec4 camColor = texture(cameraTexture, cameraFrameUV);
@@ -245,10 +252,14 @@ namespace xr
                 float is_control_uv = 0.0;//step(-0.001, babylonUV.x + babylonUV.y) * (1.0 - step(0.001, babylonUV.x + babylonUV.y));
 
                 vec2 dUV = cameraFrameUV;//vec2(1.0 - babylonUV.y, 1.0 - babylonUV.x);
-                float visibility = DepthGetVisibility(depthTexture, dUV, unpackDepth(gameColor.z) * 16.0 * 1000.0);//gameColor.z * 16.0 * 1000.0);//
+                float visibility = DepthGetVisibility(depthTexture, dUV, gameColor.z * 16.0 * 1000.0);//unpackDepth(gameColor.z) * 16.0 * 1000.0);//
+                vec3 rgb = hsv2rgb(vec3(gameColor.x, gameColor.y, 1.0));
                 //gameColor.z = 0.0;
                 //gameColor.z = unpackAlpha(gameColor.z);
                 gameColor.a = step(0.01, gameColor.r + gameColor.g + gameColor.b) * step(0.001, visibility);
+                gameColor.r = rgb.r;
+                gameColor.g = rgb.g;
+                gameColor.b = rgb.b;
                 vec4 baseColor = mix(camColor, gameColor, gameColor.a);
 
                 //baseColor = mix(baseColor, baseGameColor, step(1.999, controlColor.r + controlColor.g));
