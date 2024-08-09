@@ -163,7 +163,7 @@ namespace xr
 
         constexpr char BABYLON_FRAG_SHADER[]{ R"(#version 300 es
             #extension GL_OES_EGL_image_external_essl3 : require
-            precision mediump float;
+            precision highp float;
             in vec2 babylonUV;
             uniform sampler2D babylonTexture;
             uniform sampler2D depthTexture;
@@ -230,7 +230,7 @@ namespace xr
                 vec4 camColor = texture(cameraTexture, cameraFrameUV);
                 vec4 gameColor = texture(babylonTexture, babylonUV);
                 vec2 dUV = vec2(1.0 - babylonUV.y, 1.0 - babylonUV.x);
-                float visibility = DepthGetVisibility(depthTexture, dUV, unpackDepth(gameColor.z) * 64.0 * 1000.0);
+                float visibility = DepthGetVisibility(depthTexture, dUV, unpackDepth(gameColor.z) * 16.0 * 1000.0);
                 gameColor.a = step(0.01, gameColor.r + gameColor.g + gameColor.b) * visibility;
                 vec4 baseColor = mix(camColor, gameColor, gameColor.a);
                 oFragColor = baseColor;
