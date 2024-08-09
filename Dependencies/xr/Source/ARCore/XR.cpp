@@ -169,6 +169,7 @@ namespace xr
             uniform sampler2D depthTexture;
             in vec2 cameraFrameUV;
             uniform samplerExternalOES cameraTexture;
+            uniform sampler2D babylonDepthTexture;
             out vec4 oFragColor;
             const float kMidDepthMeters = 8.0;
             const float kMaxDepthMeters = 30.0;
@@ -233,7 +234,7 @@ namespace xr
                 float visibility = DepthGetVisibility(depthTexture, dUV, unpackDepth(gameColor.z) * 16.0 * 1000.0);
                 gameColor.a = step(0.01, gameColor.r + gameColor.g + gameColor.b) * visibility;
                 vec4 baseColor = mix(camColor, gameColor, gameColor.a);
-                oFragColor = baseColor;
+                oFragColor = texture(babylonDepthTexture, babylonUV);
                 
 
 
@@ -877,6 +878,16 @@ namespace xr
                 // Configure the camera frame UVs
                 auto cameraFrameUVsUniformLocation{ glGetUniformLocation(babylonShaderProgramId, "cameraFrameUVs") };
                 glUniform2fv(cameraFrameUVsUniformLocation, VERTEX_COUNT, CameraFrameUVs);
+
+
+                auto babylonDepthTextureId{ static_cast<GLuint>(reinterpret_cast<uintptr_t>(ActiveFrameViews[0].DepthTexturePointer)) };
+                auto babylonDepthTextureUniformLocation{ glGetUniformLocation(babylonShaderProgramId, "babylonDepthTexture") };
+                glUniform1i(babylonDepthTextureUniformLocation, GetTextureUnit(GL_TEXTURE3));
+                glActiveTexture(GL_TEXTURE3);
+                glBindTexture(GL_TEXTURE_2D, babylonDepthTextureId);
+                glBindSampler(GetTextureUnit(GL_TEXTURE3), 0);
+
+                
 
                 // Draw the quad
                 glDrawArrays(GL_TRIANGLE_STRIP, 0, VERTEX_COUNT);
