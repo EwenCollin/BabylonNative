@@ -685,6 +685,12 @@ namespace xr
                     ActiveFrameViews[0].ColorTextureFormat = TextureFormat::RGBA8_SRGB;
                     ActiveFrameViews[0].ColorTextureSize = {width, height};
                 }
+                
+                {
+                    glBindTexture(GL_TEXTURE_2D, babylonTextureCopyId);
+                    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+                    glBindTexture(GL_TEXTURE_2D, 0);
+                }
 
                 // Allocate and store the depth texture
                 {
@@ -806,14 +812,7 @@ namespace xr
                 auto babylonTextureId{ static_cast<GLuint>(reinterpret_cast<uintptr_t>(ActiveFrameViews[0].ColorTexturePointer)) };
                 
                 glBindTexture(GL_TEXTURE_2D, babylonTextureId);
-                int babylonTextureWidth = 0;
-                int babylonTextureHeight = 0;
     
-                // Get the width
-                glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &babylonTextureWidth);
-            
-                // Get the height
-                glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &babylonTextureHeight);
             
                 // Unbind the texture
                 glBindTexture(GL_TEXTURE_2D, 0);
@@ -831,18 +830,8 @@ namespace xr
                 // Bind the destination texture
                 glBindTexture(GL_TEXTURE_2D, babylonTextureCopyId);
             
-                // Check if destination texture needs resizing
-                GLint destWidth, destHeight;
-                glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &destWidth);
-                glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &destHeight);
-            
-                if (destWidth != babylonTextureWidth || destHeight != babylonTextureHeight) {
-                    // Resize destination texture
-                    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, babylonTextureWidth, babylonTextureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-                }
-            
                 // Copy the texture
-                glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, babylonTextureWidth, babylonTextureHeight);
+                glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, ActiveFrameViews[0].ColorTextureSize.Width, ActiveFrameViews[0].ColorTextureSize.Height);
             
                 // Unbind
                 glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
