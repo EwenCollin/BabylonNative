@@ -244,7 +244,7 @@ namespace xr
 
                 float is_control_uv = step(-0.001, babylonUV.x + babylonUV.y) * (1.0 - step(0.001, babylonUV.x + babylonUV.y));
 
-                vec2 dUV = vec2(1.0 - babylonUV.y, 1.0 - babylonUV.x);
+                vec2 dUV = cameraFrameUV;//vec2(1.0 - babylonUV.y, 1.0 - babylonUV.x);
                 float visibility = DepthGetVisibility(depthTexture, dUV, unpackDepth(gameColor.z) * 16.0 * 1000.0);
                 gameColor.z = unpackAlpha(gameColor.z);
                 gameColor.a = step(0.01, gameColor.r + gameColor.g + gameColor.b) * step(0.001, visibility);
