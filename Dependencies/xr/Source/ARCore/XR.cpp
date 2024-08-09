@@ -238,7 +238,7 @@ namespace xr
                 vec2 dUV = vec2(1.0 - babylonUV.y, 1.0 - babylonUV.x);
                 float visibility = DepthGetVisibility(depthTexture, dUV, unpackDepth(gameColor.z) * 16.0 * 1000.0);
                 gameColor.z = unpackAlpha(gameColor.z);
-                gameColor.a = step(0.01, gameColor.r + gameColor.g + gameColor.b) * visibility;
+                gameColor.a = step(0.01, gameColor.r + gameColor.g + gameColor.b) * step(0.001, visibility);
                 vec4 baseColor = mix(camColor, gameColor, gameColor.a);
 
                 baseColor = mix(baseColor, baseGameColor, step(1.999, controlColor.r + controlColor.g));
